@@ -18,6 +18,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => AppSettings()),
       ],
       child: aplicativo(),
+      
     ),
   );
 }
