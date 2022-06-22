@@ -1,61 +1,43 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test2/Services/auth_service.dart';
-import 'package:flutter_test2/pages/recovery_page.dart';
-import 'package:flutter_test2/pages/regist_page.dart';
+import 'package:flutter_test2/pages/login_page.dart';
 import 'package:provider/provider.dart';
 
-class LoginPage extends StatefulWidget {
-  LoginPage({Key? key}) : super(key: key);
+class RecPage extends StatefulWidget {
+  const RecPage({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RecPageState createState() => _RecPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RecPageState extends State<RecPage> {
   final formKey = GlobalKey<FormState>();
   final email = TextEditingController();
-  final senha = TextEditingController();
-  final senha2 = TextEditingController();
 
-  bool isLogin = true;
-  late String titulo = 'Bem vindo';
-  late String actionButton = 'Login';
-  late String toggleButton = 'Ainda não tem conta? Cadastre-se agora.';
-  late String toggleButton2 = 'Esqueci minha senha';
+  late String titulo = 'Recuperar senha';
+  late String actionButton = 'Recuperar';
+  late String toggleButton = 'voltar ao Login';
   bool loading = false;
 
   void initState() {
     super.initState();
-    setFormAction(true);
   }
 
-  setFormAction(bool acao) {
-    setState(() {
-      isLogin = acao;
-      if (isLogin) {
-        titulo;
-        actionButton;
-        toggleButton;
-      } else {
-        RegistPage();
-      }
-    });
-  }
-
-  login() async {
-    setState(() => loading = true);
+  recuperar() async {
     try {
-      await context.read<AuthService>().login(email.text, senha.text);
+      setState(() => loading = true);
+      await context.read<AuthService>().recuperar(email.text);
     } on AuthException catch (e) {
       setState(() => loading = false);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.message)));
+      return;
     }
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Verifique seu email!')));
     setState(() => loading = false);
+    Navigator.pop(context);
   }
-
-  registrar() {}
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,30 +77,11 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(24),
-                  child: TextFormField(
-                    controller: senha,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Senha',
-                    ),
-                    validator: (senha) {
-                      if (senha!.isEmpty) {
-                        return 'Digite uma senha!';
-                      } else if (senha.length < 6) {
-                        return 'Sua senha deve conter no mínimo 6 caracteres';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Padding(
                   padding: EdgeInsets.all(24.0),
                   child: ElevatedButton(
                     onPressed: () {
                       if (formKey.currentState!.validate()) {
-                        login();
+                        recuperar();
                       }
                     },
                     child: Row(
@@ -150,13 +113,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 TextButton(
-                    onPressed: (() => Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => RegistPage()))),
-                    child: Text(toggleButton)),
-                TextButton(
-                    onPressed: (() => Navigator.push(
-                        context, MaterialPageRoute(builder: (_) => RecPage()))),
-                    child: Text(toggleButton2))
+                    onPressed: (() => Navigator.pop(context)),
+                    child: Text(toggleButton))
               ],
             ),
           ),

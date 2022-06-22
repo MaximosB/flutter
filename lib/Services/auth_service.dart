@@ -61,6 +61,19 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  recuperar(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      _getUser();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-email') {
+        throw AuthException('Email invalido.');
+      } else if (e.code == 'user-not-found') {
+        throw AuthException('Email não encontrado!');
+      }
+    }
+  }
+
   logout() async {
     await _auth.signOut();
     _getUser();
